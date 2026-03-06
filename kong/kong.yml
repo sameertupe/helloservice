@@ -1,0 +1,22 @@
+_format_version: "3.0"
+
+services:
+  - name: hello-service
+    url: http://host.docker.internal:8080
+    routes:
+      - name: hello-route
+        methods:
+          - GET
+        paths:
+          - /hello
+        strip_path: false
+
+  - name: pizza-order-service
+    url: http://host.docker.internal:8080
+    routes:
+      - name: pizza-order-route
+        methods:
+          - POST
+        paths:
+          - /PlacePizzaOrder
+        strip_path: false
