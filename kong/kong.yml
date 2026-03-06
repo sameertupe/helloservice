@@ -1,8 +1,25 @@
 _format_version: "3.0"
 
+upstreams:
+  - name: helloservice-upstream
+    algorithm: round-robin
+    targets:
+      - target: host.docker.internal:8080
+      - target: host.docker.internal:8081
+      - target: host.docker.internal:8082
+      - target: host.docker.internal:8083
+      - target: host.docker.internal:8084
+      - target: host.docker.internal:8085
+      - target: host.docker.internal:8086
+      - target: host.docker.internal:8087
+      - target: host.docker.internal:8088
+      - target: host.docker.internal:8089
+
 services:
   - name: hello-service
-    url: http://host.docker.internal:8080
+    host: helloservice-upstream
+    port: 80
+    protocol: http
     routes:
       - name: hello-route
         methods:
@@ -12,7 +29,9 @@ services:
         strip_path: false
 
   - name: pizza-order-service
-    url: http://host.docker.internal:8080
+    host: helloservice-upstream
+    port: 80
+    protocol: http
     routes:
       - name: pizza-order-route
         methods:
