@@ -1,0 +1,138 @@
+{
+  "title": "Pizza App - API Metrics",
+  "uid": "pizza-app",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Request Rate (req/sec)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_count{application=\"helloservice\", uri=\"/hello\"}[1m])",
+          "legendFormat": "GET /hello",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(http_server_requests_seconds_count{application=\"helloservice\", uri=\"/PlacePizzaOrder\"}[1m])",
+          "legendFormat": "POST /PlacePizzaOrder",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "color": { "mode": "palette-classic" } }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Total Request Count",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "expr": "sum(http_server_requests_seconds_count{application=\"helloservice\", uri=\"/hello\"})",
+          "legendFormat": "GET /hello",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "textMode": "auto", "colorMode": "background" }
+    },
+    {
+      "id": 3,
+      "title": "Total Request Count",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "expr": "sum(http_server_requests_seconds_count{application=\"helloservice\", uri=\"/PlacePizzaOrder\"})",
+          "legendFormat": "POST /PlacePizzaOrder",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "orientation": "auto", "textMode": "auto", "colorMode": "background" }
+    },
+    {
+      "id": 4,
+      "title": "Average Response Time (ms)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_sum{application=\"helloservice\", uri=\"/hello\"}[1m]) / rate(http_server_requests_seconds_count{application=\"helloservice\", uri=\"/hello\"}[1m]) * 1000",
+          "legendFormat": "GET /hello",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(http_server_requests_seconds_sum{application=\"helloservice\", uri=\"/PlacePizzaOrder\"}[1m]) / rate(http_server_requests_seconds_count{application=\"helloservice\", uri=\"/PlacePizzaOrder\"}[1m]) * 1000",
+          "legendFormat": "POST /PlacePizzaOrder",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "ms", "color": { "mode": "palette-classic" } }
+      }
+    },
+    {
+      "id": 5,
+      "title": "HTTP Error Rate (4xx + 5xx)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{application=\"helloservice\", status=~\"4..|5..\"}[1m])) by (uri, status)",
+          "legendFormat": "{{uri}} - {{status}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "color": { "fixedColor": "red", "mode": "fixed" } }
+      }
+    },
+    {
+      "id": 6,
+      "title": "JVM Heap Memory Used",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{application=\"helloservice\", area=\"heap\"}",
+          "legendFormat": "{{id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "color": { "mode": "palette-classic" } }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Active HTTP Connections",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "tomcat_connections_active_current{application=\"helloservice\"}",
+          "legendFormat": "Active Connections",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short", "color": { "mode": "palette-classic" } }
+      }
+    }
+  ]
+}
