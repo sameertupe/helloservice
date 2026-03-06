@@ -1,0 +1,53 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: Pizza App Alerts
+    folder: Pizza App
+    interval: 1m
+    rules:
+      - uid: high-rps-per-instance
+        title: "Instance Request Rate > 30 req/min"
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus-ds
+            model:
+              expr: "sum by (instance) (rate(http_server_requests_seconds_count{application=\"helloservice\", uri=~\"/hello|/PlacePizzaOrder\"}[1m])) * 60"
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: "-100"
+            model:
+              type: threshold
+              refId: B
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 30
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  reducer:
+                    type: last
+        noDataState: NoData
+        execErrState: Alerting
+        for: 0s
+        annotations:
+          summary: "High traffic on {{ $labels.instance }}"
+          description: "Instance {{ $labels.instance }} is receiving more than 30 requests/min (current: {{ $values.A }} req/min)"
+        labels:
+          severity: warning
+        isPaused: false
